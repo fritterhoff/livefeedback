@@ -19,7 +19,7 @@ const plugin: JupyterFrontEndPlugin<void> = {
       const { notebook } = args;
       const ipynb: INotebookModel | null = notebook.model;
       console.log(ipynb?.toJSON());
-      requestAPI<any>('grade', {
+      requestAPI<any>('submit', {
         method: 'POST',
         body: JSON.stringify(ipynb?.toJSON())
       })
