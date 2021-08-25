@@ -13,7 +13,7 @@ export async function requestAPI<T>(
 ): Promise<T> {
   // Make request to Jupyter API
   const settings = ServerConnection.makeSettings();
-  const base = process.env.JUPYTERHUB_BASE_URL ||'/';
+  const base = process.env.JUPYTERHUB_BASE_URL || '/';
   const requestUrl = base + 'services/Feedback/' + endPoint;
 
   let response: Response;
