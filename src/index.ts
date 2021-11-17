@@ -45,7 +45,7 @@ const plugin: JupyterFrontEndPlugin<void> = {
           method: 'POST',
           body: JSON.stringify(data),
           headers: {
-            'target':  window.location.protocol + "//"+ window.location.host,
+            target: window.location.protocol + '//' + window.location.host
           }
         })
           .then(data => {
