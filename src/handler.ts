@@ -54,12 +54,13 @@ function handleRequest(
 
   const request = new settings.Request(url, { ...settings.init, ...init });
 
+  const token = process.env.JUPYTERHUB_API_TOKEN || '';
   // Handle authentication. Authentication can be overdetermined by
   // settings token and XSRF token.
   let authenticated = false;
-  if (settings.token) {
+  if (token) {
     authenticated = true;
-    request.headers.append('Authorization', `token ${settings.token}`);
+    request.headers.append('Authorization', `token ${token}`);
   }
   if (typeof document !== 'undefined' && document?.cookie) {
     const xsrfToken = getCookie('_xsrf');
