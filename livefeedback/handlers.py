@@ -15,7 +15,7 @@ class RouteHandler(APIHandler):
     def post(self):
         base = self.request.headers["target"]
 
-        path = f"https://{base}/services/Feedback/submit"
+        path = f"{base}/services/Feedback/submit"
         token = os.getenv("JUPYTERHUB_API_TOKEN")
         r = requests.post(path, data=self.request.body, headers={"Content-Type": "application/json", "Authorization": f"token {token}"})
         self.set_status(r.status_code)
