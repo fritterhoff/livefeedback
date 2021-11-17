@@ -2,6 +2,7 @@
 livefeedback setup
 """
 import json
+import sys
 from pathlib import Path
 
 import setuptools
@@ -22,23 +23,35 @@ ensured_targets = [
 labext_name = "livefeedback"
 
 data_files_spec = [
-    ("share/jupyter/labextensions/%s" % labext_name, str(lab_path), "**"),
-    ("share/jupyter/labextensions/%s" % labext_name, str(HERE), "install.json"),
+    ("share/jupyter/labextensions/%s" % labext_name, str(lab_path.relative_to(HERE)), "**"),
+    ("share/jupyter/labextensions/%s" % labext_name, str("."), "install.json"),
+    ("etc/jupyter/jupyter_server_config.d",
+     "jupyter-config/server-config", "livefeedback.json"),
+    # For backward compatibility with notebook server
+    ("etc/jupyter/jupyter_notebook_config.d",
+     "jupyter-config/nb-config", "livefeedback.json"),
 ]
 
 long_description = (HERE / "README.md").read_text()
 
 # Get the package info from package.json
 pkg_json = json.loads((HERE / "package.json").read_bytes())
+version = (
+    pkg_json["version"]
+    .replace("-alpha.", "a")
+    .replace("-beta.", "b")
+    .replace("-rc.", "rc")
+) 
 
 setup_args = dict(
     name=name,
-    version=pkg_json["version"],
+    version=version,
     url=pkg_json["homepage"],
     author=pkg_json["author"]["name"],
     author_email=pkg_json["author"]["email"],
     description=pkg_json["description"],
     license=pkg_json["license"],
+    license_file="LICENSE",
     long_description=long_description,
     long_description_content_type="text/markdown",
     packages=setuptools.find_packages(),
@@ -59,6 +72,10 @@ setup_args = dict(
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
         "Framework :: Jupyter",
+        "Framework :: Jupyter :: JupyterLab",
+        "Framework :: Jupyter :: JupyterLab :: 3",
+        "Framework :: Jupyter :: JupyterLab :: Extensions",
+        "Framework :: Jupyter :: JupyterLab :: Extensions :: Prebuilt",
     ],
 )
 
@@ -71,10 +88,14 @@ try:
     post_develop = npm_builder(
         build_cmd="install:extension", source_dir="src", build_dir=lab_path
     )
-    setup_args['cmdclass'] = wrap_installers(post_develop=post_develop, ensured_targets=ensured_targets)
-    setup_args['data_files'] = get_data_files(data_files_spec)
+    setup_args["cmdclass"] = wrap_installers(post_develop=post_develop, ensured_targets=ensured_targets)
+    setup_args["data_files"] = get_data_files(data_files_spec)
 except ImportError as e:
-    pass
+    import logging
+    logging.basicConfig(format="%(levelname)s: %(message)s")
+    logging.warning("Build tool `jupyter-packaging` is missing. Install it with pip or conda.")
+    if not ("--name" in sys.argv or "--version" in sys.argv):
+        raise e
 
 if __name__ == "__main__":
     setuptools.setup(**setup_args)

@@ -43,7 +43,10 @@ const plugin: JupyterFrontEndPlugin<void> = {
         }
         requestAPI<any>('submit', {
           method: 'POST',
-          body: JSON.stringify(data)
+          body: JSON.stringify(data),
+          headers: {
+            'target':  window.location.protocol + "//"+ window.location.host,
+          }
         })
           .then(data => {
             console.log(data);
