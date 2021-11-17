@@ -14,11 +14,11 @@ class RouteHandler(APIHandler):
     @tornado.web.authenticated
     def post(self):
         base = self.request.headers["target"]
-        xsrf = self.request.cookies["_xsrf"]
-        
+        xsrf = self.get_cookie("_xsrf")
+
         path = f"{base}/services/Feedback/submit"
         token = os.getenv("JUPYTERHUB_API_TOKEN")
-        r = requests.post(path, data=self.request.body, headers={"Content-Type": "application/json", "Authorization": f"token {token}"},cookies={"_xsrf": xsrf})
+        r = requests.post(path, data=self.request.body, headers={"Content-Type": "application/json", "Authorization": f"token {token}"}, cookies={"_xsrf": xsrf})
         self.set_status(r.status_code)
         self.finish()
 
